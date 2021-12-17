@@ -237,6 +237,7 @@ int main(int argc, char** argv)
     tx.createBranch<LV>("tag_p4");
     tx.createBranch<LV>("p4");
     tx.createBranch<int>("pass_id");
+    tx.createBranch<float>("mll");
 
     tx.createBranch<vector<LV>>("lep_p4s");
     tx.createBranch<vector<int>>("lep_pdgids");
@@ -271,9 +272,86 @@ int main(int argc, char** argv)
                                           return true;
 
                                       }, UNITY);
+    ana.cutflow.addCutToLastActiveCut("DileptonSelection",
+                                      [&]()
+                                      {
+                                          if (not (tx.getBranchLazy<vector<LV>>("lep_p4s").size() == 2)) return false;
+                                          tx.setBranch<float>("mll", (tx.getBranchLazy<vector<LV>>("lep_p4s")[0]+tx.getBranchLazy<vector<LV>>("lep_p4s")[1]).mass());
+                                          if (not (fabs(tx.getBranch<float>("mll") - 90) < 30)) return false;
+                                          return true;
+                                      }, UNITY);
+    ana.cutflow.getCut("DileptonSelection");
+    ana.cutflow.addCutToLastActiveCut("MuonTnPPreselection",
+                                      [&]()
+                                      {
+                                          if (not (tx.getBranchLazy<vector<int>>("lep_pdgids")[0]*tx.getBranchLazy<vector<int>>("lep_pdgids")[1] == -169)) return false;
+                                          return true;
+                                      }, UNITY);
+    ana.cutflow.addCutToLastActiveCut("MuonTnPTriggerSelection",
+                                      [&]()
+                                      {
+                                          bool Common_HLT_IsoMu24   = false;
+                                          bool Common_HLT_IsoTkMu24 = false;
+                                          bool Common_HLT_IsoMu27   = false;
+                                          try { Common_HLT_IsoMu24   = nt.HLT_IsoMu24();   } catch (std::runtime_error) { Common_HLT_IsoMu24   = false; }
+                                          try { Common_HLT_IsoTkMu24 = nt.HLT_IsoTkMu24(); } catch (std::runtime_error) { Common_HLT_IsoTkMu24 = false; }
+                                          try { Common_HLT_IsoMu27   = nt.HLT_IsoMu27();   } catch (std::runtime_error) { Common_HLT_IsoMu27   = false; }
+                                          bool trig_sm = false;
+                                          switch (nt.year())
+                                          {
+                                              case 2016:
+                                                  trig_sm = Common_HLT_IsoMu24 or Common_HLT_IsoTkMu24;
+                                                  break;
+                                              case 2017:
+                                                  trig_sm = Common_HLT_IsoMu27;
+                                                  break;
+                                              case 2018:
+                                                  trig_sm = Common_HLT_IsoMu24;
+                                                  break;
+                                          }
+                                          return trig_sm;
+                                      }, UNITY);
+    ana.cutflow.getCut("DileptonSelection");
+    ana.cutflow.addCutToLastActiveCut("ElecTnPPreselection",
+                                      [&]()
+                                      {
+                                          if (not (tx.getBranchLazy<vector<int>>("lep_pdgids")[0]*tx.getBranchLazy<vector<int>>("lep_pdgids")[1] == -121)) return false;
+                                          return true;
+                                      }, UNITY);
+    ana.cutflow.addCutToLastActiveCut("ElecTnPTriggerSelection",
+                                      [&]()
+                                      {
+                                          bool Common_HLT_Ele27_WPTight_Gsf        = false;
+                                          bool Common_HLT_Ele25_eta2p1_WPTight_Gsf = false;
+                                          bool Common_HLT_Ele35_WPTight_Gsf        = false;
+                                          bool Common_HLT_Ele32_WPTight_Gsf        = false;
+                                          try { Common_HLT_Ele27_WPTight_Gsf        = nt.HLT_Ele27_WPTight_Gsf();        } catch (std::runtime_error) { Common_HLT_Ele27_WPTight_Gsf        = false; }
+                                          try { Common_HLT_Ele25_eta2p1_WPTight_Gsf = nt.HLT_Ele25_eta2p1_WPTight_Gsf(); } catch (std::runtime_error) { Common_HLT_Ele25_eta2p1_WPTight_Gsf = false; }
+                                          try { Common_HLT_Ele35_WPTight_Gsf        = nt.HLT_Ele35_WPTight_Gsf();        } catch (std::runtime_error) { Common_HLT_Ele35_WPTight_Gsf        = false; }
+                                          try { Common_HLT_Ele32_WPTight_Gsf        = nt.HLT_Ele32_WPTight_Gsf();        } catch (std::runtime_error) { Common_HLT_Ele32_WPTight_Gsf        = false; }
+                                          bool trig_se = false;
+                                          switch (nt.year())
+                                          {
+                                              case 2016:
+                                                  trig_se = Common_HLT_Ele27_WPTight_Gsf or Common_HLT_Ele25_eta2p1_WPTight_Gsf;
+                                                  break;
+                                              case 2017:
+                                                  trig_se = Common_HLT_Ele35_WPTight_Gsf;
+                                                  break;
+                                              case 2018:
+                                                  trig_se = Common_HLT_Ele32_WPTight_Gsf;
+                                                  break;
+                                          }
+                                          return trig_se;
+                                      }, UNITY);
+
+    ana.histograms.addHistogram("Nlep", 7, 0, 7, [&]() { return tx.getBranchLazy<vector<LV>>("lep_p4s").size(); } );
+    ana.histograms.addHistogram("MllFull", 180, 0, 250, [&]() { return tx.getBranch<float>("mll"); } );
+    ana.histograms.addHistogram("Mll", 180, 60, 120, [&]() { return tx.getBranch<float>("mll"); } );
 
     ana.cutflow.bookCutflows();
-    ana.cutflow.bookHistogramsForCutAndBelow(ana.histograms, "Weight");
+    ana.cutflow.bookHistogramsForCutAndBelow(ana.histograms, "MuonTnPPreselection");
+    ana.cutflow.bookHistogramsForCutAndBelow(ana.histograms, "ElecTnPPreselection");
 
     while (ana.looper.nextEvent())
     {
