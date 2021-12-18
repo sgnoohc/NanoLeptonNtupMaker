@@ -2,6 +2,7 @@
 #include "rooutil.h"
 #include "cxxopts.h"
 #include "Base.h"
+#include "Config.h"
 #include "ElectronSelections.h"
 #include "MuonSelections.h"
 
@@ -229,18 +230,100 @@ int main(int argc, char** argv)
 
     ana.looper.init(ana.events_tchain, &nt, ana.n_events);
 
+    bool isUL = (
+        ana.input_file_list_tstring.Contains("UL18") or ana.input_file_list_tstring.Contains("UL2018") or
+        ana.input_file_list_tstring.Contains("UL17") or ana.input_file_list_tstring.Contains("UL2017") or
+        ana.input_file_list_tstring.Contains("UL16") or ana.input_file_list_tstring.Contains("UL2016")
+        );
+
+    bool isAPV = ana.input_file_list_tstring.Contains("NanoAODAPVv9") or ana.input_file_list_tstring.Contains("NanoAODAPVv2") or ana.input_file_list_tstring.Contains("HIPM_UL2016") or ana.input_file_list_tstring.Contains("Run2016C-UL2016") or ana.input_file_list_tstring.Contains("Run2016D-UL2016") or ana.input_file_list_tstring.Contains("Run2016E-UL2016");
+    gconf.nanoAOD_ver = isUL ? 8 : 0;
+    gconf.isAPV = isAPV ? 1 : 0;
+    gconf.GetConfigs(nt.year());
+    std::cout <<  " gconf.nanoAOD_ver: " << gconf.nanoAOD_ver <<  " gconf.isAPV: " << gconf.isAPV <<  " nt.year(): " << nt.year() <<  std::endl;
+
     // Variables
     RooUtil::TTreeX tx("variable", "variable");
 
+    tx.createBranch<int>("run");
+    tx.createBranch<int>("lumi");
+    tx.createBranch<unsigned long long>("evt");
     tx.createBranch<int>("is_ee");
     tx.createBranch<int>("is_mm");
     tx.createBranch<LV>("tag_p4");
     tx.createBranch<LV>("p4");
-    tx.createBranch<int>("pass_id");
+    tx.createBranch<int>("pass_ttHTightId");
     tx.createBranch<float>("mll");
 
-    tx.createBranch<vector<LV>>("lep_p4s");
-    tx.createBranch<vector<int>>("lep_pdgids");
+    tx.createBranch<vector<float>>("Mee_pt0_eta0_pass", false);
+    tx.createBranch<vector<float>>("Mee_pt1_eta0_pass", false);
+    tx.createBranch<vector<float>>("Mee_pt2_eta0_pass", false);
+    tx.createBranch<vector<float>>("Mee_pt3_eta0_pass", false);
+    tx.createBranch<vector<float>>("Mee_pt0_eta1_pass", false);
+    tx.createBranch<vector<float>>("Mee_pt1_eta1_pass", false);
+    tx.createBranch<vector<float>>("Mee_pt2_eta1_pass", false);
+    tx.createBranch<vector<float>>("Mee_pt3_eta1_pass", false);
+    tx.createBranch<vector<float>>("Mee_pt0_eta2_pass", false);
+    tx.createBranch<vector<float>>("Mee_pt1_eta2_pass", false);
+    tx.createBranch<vector<float>>("Mee_pt2_eta2_pass", false);
+    tx.createBranch<vector<float>>("Mee_pt3_eta2_pass", false);
+    tx.createBranch<vector<float>>("Mee_pt0_eta3_pass", false);
+    tx.createBranch<vector<float>>("Mee_pt1_eta3_pass", false);
+    tx.createBranch<vector<float>>("Mee_pt2_eta3_pass", false);
+    tx.createBranch<vector<float>>("Mee_pt3_eta3_pass", false);
+    tx.createBranch<vector<float>>("Mmm_pt0_eta0_pass", false);
+    tx.createBranch<vector<float>>("Mmm_pt1_eta0_pass", false);
+    tx.createBranch<vector<float>>("Mmm_pt2_eta0_pass", false);
+    tx.createBranch<vector<float>>("Mmm_pt3_eta0_pass", false);
+    tx.createBranch<vector<float>>("Mmm_pt0_eta1_pass", false);
+    tx.createBranch<vector<float>>("Mmm_pt1_eta1_pass", false);
+    tx.createBranch<vector<float>>("Mmm_pt2_eta1_pass", false);
+    tx.createBranch<vector<float>>("Mmm_pt3_eta1_pass", false);
+    tx.createBranch<vector<float>>("Mmm_pt0_eta2_pass", false);
+    tx.createBranch<vector<float>>("Mmm_pt1_eta2_pass", false);
+    tx.createBranch<vector<float>>("Mmm_pt2_eta2_pass", false);
+    tx.createBranch<vector<float>>("Mmm_pt3_eta2_pass", false);
+    tx.createBranch<vector<float>>("Mmm_pt0_eta3_pass", false);
+    tx.createBranch<vector<float>>("Mmm_pt1_eta3_pass", false);
+    tx.createBranch<vector<float>>("Mmm_pt2_eta3_pass", false);
+    tx.createBranch<vector<float>>("Mmm_pt3_eta3_pass", false);
+
+    tx.createBranch<vector<float>>("Mee_pt0_eta0_fail", false);
+    tx.createBranch<vector<float>>("Mee_pt1_eta0_fail", false);
+    tx.createBranch<vector<float>>("Mee_pt2_eta0_fail", false);
+    tx.createBranch<vector<float>>("Mee_pt3_eta0_fail", false);
+    tx.createBranch<vector<float>>("Mee_pt0_eta1_fail", false);
+    tx.createBranch<vector<float>>("Mee_pt1_eta1_fail", false);
+    tx.createBranch<vector<float>>("Mee_pt2_eta1_fail", false);
+    tx.createBranch<vector<float>>("Mee_pt3_eta1_fail", false);
+    tx.createBranch<vector<float>>("Mee_pt0_eta2_fail", false);
+    tx.createBranch<vector<float>>("Mee_pt1_eta2_fail", false);
+    tx.createBranch<vector<float>>("Mee_pt2_eta2_fail", false);
+    tx.createBranch<vector<float>>("Mee_pt3_eta2_fail", false);
+    tx.createBranch<vector<float>>("Mee_pt0_eta3_fail", false);
+    tx.createBranch<vector<float>>("Mee_pt1_eta3_fail", false);
+    tx.createBranch<vector<float>>("Mee_pt2_eta3_fail", false);
+    tx.createBranch<vector<float>>("Mee_pt3_eta3_fail", false);
+    tx.createBranch<vector<float>>("Mmm_pt0_eta0_fail", false);
+    tx.createBranch<vector<float>>("Mmm_pt1_eta0_fail", false);
+    tx.createBranch<vector<float>>("Mmm_pt2_eta0_fail", false);
+    tx.createBranch<vector<float>>("Mmm_pt3_eta0_fail", false);
+    tx.createBranch<vector<float>>("Mmm_pt0_eta1_fail", false);
+    tx.createBranch<vector<float>>("Mmm_pt1_eta1_fail", false);
+    tx.createBranch<vector<float>>("Mmm_pt2_eta1_fail", false);
+    tx.createBranch<vector<float>>("Mmm_pt3_eta1_fail", false);
+    tx.createBranch<vector<float>>("Mmm_pt0_eta2_fail", false);
+    tx.createBranch<vector<float>>("Mmm_pt1_eta2_fail", false);
+    tx.createBranch<vector<float>>("Mmm_pt2_eta2_fail", false);
+    tx.createBranch<vector<float>>("Mmm_pt3_eta2_fail", false);
+    tx.createBranch<vector<float>>("Mmm_pt0_eta3_fail", false);
+    tx.createBranch<vector<float>>("Mmm_pt1_eta3_fail", false);
+    tx.createBranch<vector<float>>("Mmm_pt2_eta3_fail", false);
+    tx.createBranch<vector<float>>("Mmm_pt3_eta3_fail", false);
+
+    tx.createBranch<vector<LV>>("lep_p4s", false);
+    tx.createBranch<vector<int>>("lep_pdgids", false);
+    tx.createBranch<vector<int>>("lep_idxs", false);
 
     ana.cutflow.setTFile(ana.output_tfile);
     ana.cutflow.addCut("Weight", UNITY, UNITY);
@@ -252,10 +335,11 @@ int main(int argc, char** argv)
                                           {
                                               // Loose POG ID
                                               if (not (nt.Muon_looseId()[imu]        )) continue;
-                                              if (not (nt.Muon_pt()[imu]        > 40 )) continue;
+                                              if (not (nt.Muon_pt()[imu]        > 30 )) continue;
                                               if (not (fabs(nt.Muon_eta()[imu]) < 2.4)) continue;
                                               tx.pushbackToBranch<LV>("lep_p4s", nt.Muon_p4()[imu]);
                                               tx.pushbackToBranch<int>("lep_pdgids", (-nt.Muon_charge()[imu]) * 13);
+                                              tx.pushbackToBranch<int>("lep_idxs", imu);
                                           }
 
                                           // Select electrons
@@ -263,10 +347,11 @@ int main(int argc, char** argv)
                                           {
                                               // Loose POG ID
                                               if (not (nt.Electron_mvaFall17V2noIso_WPL()[iel])) continue;
-                                              if (not (nt.Electron_pt()[iel]        > 40      )) continue;
+                                              if (not (nt.Electron_pt()[iel]        > 30      )) continue;
                                               if (not (fabs(nt.Electron_eta()[iel]) < 2.5     )) continue;
                                               tx.pushbackToBranch<LV>("lep_p4s", nt.Electron_p4()[iel]);
                                               tx.pushbackToBranch<int>("lep_pdgids", (-nt.Electron_charge()[iel]) * 11);
+                                              tx.pushbackToBranch<int>("lep_idxs", iel);
                                           }
 
                                           return true;
@@ -277,6 +362,9 @@ int main(int argc, char** argv)
                                       {
                                           if (not (tx.getBranchLazy<vector<LV>>("lep_p4s").size() == 2)) return false;
                                           tx.setBranch<float>("mll", (tx.getBranchLazy<vector<LV>>("lep_p4s")[0]+tx.getBranchLazy<vector<LV>>("lep_p4s")[1]).mass());
+                                          tx.setBranch<int>("run", nt.run());
+                                          tx.setBranch<int>("lumi", nt.luminosityBlock());
+                                          tx.setBranch<unsigned long long>("evt", nt.event());
                                           if (not (fabs(tx.getBranch<float>("mll") - 90) < 30)) return false;
                                           return true;
                                       }, UNITY);
@@ -311,6 +399,125 @@ int main(int argc, char** argv)
                                           }
                                           return trig_sm;
                                       }, UNITY);
+    ana.cutflow.addCutToLastActiveCut("MuonTnPTagProbePairSelection",
+                                      [&]()
+                                      {
+                                          int imu = tx.getBranchLazy<vector<int>>("lep_idxs")[0];
+                                          int jmu = tx.getBranchLazy<vector<int>>("lep_idxs")[1];
+                                          if (
+                                              (fabs(nt.Muon_dxy()[imu]) < 0.02) and
+                                              (fabs(nt.Muon_dz()[imu]) < 0.05) and
+                                              (fabs(nt.Muon_sip3d()[imu]) < 4) and
+                                              (nt.Muon_tightId()[imu]) and
+                                              (fabs(nt.Muon_pfIsoId()[imu]) >= 3)
+                                             )
+                                          {
+                                              tx.setBranch<int>("is_ee", false);
+                                              tx.setBranch<int>("is_mm", true);
+                                              tx.setBranch<LV>("tag_p4", nt.Muon_p4()[imu]);
+                                              tx.setBranch<LV>("p4", nt.Muon_p4()[jmu]);
+                                              tx.setBranch<int>("pass_ttHTightId", ttH::muonID(jmu, ttH::IDtight, nt.year()));
+                                              float pt = tx.getBranchLazy<LV>("p4").pt();
+                                              float eta = fabs(tx.getBranchLazy<LV>("p4").eta());
+                                              bool pass = tx.getBranchLazy<int>("pass_ttHTightId");
+                                              if (pass)
+                                              {
+                                                  if      (eta >= 0   and eta < 0.9 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mmm_pt0_eta0_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mmm_pt1_eta0_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mmm_pt2_eta0_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 80            ) tx.pushbackToBranch<float>("Mmm_pt3_eta0_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mmm_pt0_eta1_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mmm_pt1_eta1_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mmm_pt2_eta1_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 80            ) tx.pushbackToBranch<float>("Mmm_pt3_eta1_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mmm_pt0_eta2_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mmm_pt1_eta2_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mmm_pt2_eta2_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 80            ) tx.pushbackToBranch<float>("Mmm_pt3_eta2_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mmm_pt0_eta3_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mmm_pt1_eta3_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mmm_pt2_eta3_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 80            ) tx.pushbackToBranch<float>("Mmm_pt3_eta3_pass", tx.getBranchLazy<float>("mll"));
+                                              }
+                                              else
+                                              {
+                                                  if      (eta >= 0   and eta < 0.9 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mmm_pt0_eta0_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mmm_pt1_eta0_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mmm_pt2_eta0_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 80            ) tx.pushbackToBranch<float>("Mmm_pt3_eta0_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mmm_pt0_eta1_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mmm_pt1_eta1_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mmm_pt2_eta1_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 80            ) tx.pushbackToBranch<float>("Mmm_pt3_eta1_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mmm_pt0_eta2_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mmm_pt1_eta2_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mmm_pt2_eta2_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 80            ) tx.pushbackToBranch<float>("Mmm_pt3_eta2_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mmm_pt0_eta3_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mmm_pt1_eta3_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mmm_pt2_eta3_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 80            ) tx.pushbackToBranch<float>("Mmm_pt3_eta3_fail", tx.getBranchLazy<float>("mll"));
+                                              }
+                                              tx.fill();
+                                          }
+                                          if (
+                                              (fabs(nt.Muon_dxy()[jmu]) < 0.02) and
+                                              (fabs(nt.Muon_dz()[jmu]) < 0.05) and
+                                              (fabs(nt.Muon_sip3d()[jmu]) < 4) and
+                                              (nt.Muon_tightId()[jmu]) and
+                                              (fabs(nt.Muon_pfIsoId()[jmu]) >= 3)
+                                             )
+                                          {
+                                              tx.setBranch<int>("is_ee", false);
+                                              tx.setBranch<int>("is_mm", true);
+                                              tx.setBranch<LV>("tag_p4", nt.Muon_p4()[jmu]);
+                                              tx.setBranch<LV>("p4", nt.Muon_p4()[imu]);
+                                              tx.setBranch<int>("pass_ttHTightId", ttH::muonID(imu, ttH::IDtight, nt.year()));
+                                              float pt = tx.getBranchLazy<LV>("p4").pt();
+                                              float eta = fabs(tx.getBranchLazy<LV>("p4").eta());
+                                              bool pass = tx.getBranchLazy<int>("pass_ttHTightId");
+                                              if (pass)
+                                              {
+                                                  if      (eta >= 0   and eta < 0.9 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mmm_pt0_eta0_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mmm_pt1_eta0_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mmm_pt2_eta0_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 80            ) tx.pushbackToBranch<float>("Mmm_pt3_eta0_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mmm_pt0_eta1_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mmm_pt1_eta1_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mmm_pt2_eta1_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 80            ) tx.pushbackToBranch<float>("Mmm_pt3_eta1_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mmm_pt0_eta2_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mmm_pt1_eta2_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mmm_pt2_eta2_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 80            ) tx.pushbackToBranch<float>("Mmm_pt3_eta2_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mmm_pt0_eta3_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mmm_pt1_eta3_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mmm_pt2_eta3_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 80            ) tx.pushbackToBranch<float>("Mmm_pt3_eta3_pass", tx.getBranchLazy<float>("mll"));
+                                              }
+                                              else
+                                              {
+                                                  if      (eta >= 0   and eta < 0.9 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mmm_pt0_eta0_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mmm_pt1_eta0_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mmm_pt2_eta0_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 80            ) tx.pushbackToBranch<float>("Mmm_pt3_eta0_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mmm_pt0_eta1_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mmm_pt1_eta1_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mmm_pt2_eta1_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 80            ) tx.pushbackToBranch<float>("Mmm_pt3_eta1_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mmm_pt0_eta2_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mmm_pt1_eta2_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mmm_pt2_eta2_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 80            ) tx.pushbackToBranch<float>("Mmm_pt3_eta2_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mmm_pt0_eta3_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mmm_pt1_eta3_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mmm_pt2_eta3_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 80            ) tx.pushbackToBranch<float>("Mmm_pt3_eta3_fail", tx.getBranchLazy<float>("mll"));
+                                              }
+                                              tx.fill();
+                                          }
+                                          return true;
+                                      }, UNITY);
     ana.cutflow.getCut("DileptonSelection");
     ana.cutflow.addCutToLastActiveCut("ElecTnPPreselection",
                                       [&]()
@@ -344,14 +551,201 @@ int main(int argc, char** argv)
                                           }
                                           return trig_se;
                                       }, UNITY);
+    ana.cutflow.addCutToLastActiveCut("ElecTnPTagProbePairSelection",
+                                      [&]()
+                                      {
+                                          int iel = tx.getBranchLazy<vector<int>>("lep_idxs")[0];
+                                          int jel = tx.getBranchLazy<vector<int>>("lep_idxs")[1];
+                                          if (
+                                              (fabs(nt.Electron_pt()[iel]) > 40) and // additional pt cuts to go above trigger
+                                              (fabs(nt.Electron_sip3d()[iel]) < 4) and
+                                              (fabs(nt.Electron_mvaFall17V2Iso_WP90()[iel]))
+                                             )
+                                          {
+                                              tx.setBranch<int>("is_ee", true);
+                                              tx.setBranch<int>("is_mm", false);
+                                              tx.setBranch<LV>("tag_p4", nt.Electron_p4()[iel]);
+                                              tx.setBranch<LV>("p4", nt.Electron_p4()[jel]);
+                                              tx.setBranch<int>("pass_ttHTightId", ttH::electronID(jel, ttH::IDtight, nt.year()));
+                                              float pt = tx.getBranchLazy<LV>("p4").pt();
+                                              float eta = fabs(tx.getBranchLazy<LV>("p4").eta());
+                                              bool pass = tx.getBranchLazy<int>("pass_ttHTightId");
+                                              if (pass)
+                                              {
+                                                  if      (eta >= 0   and eta < 0.9 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mee_pt0_eta0_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mee_pt1_eta0_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mee_pt2_eta0_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 80            ) tx.pushbackToBranch<float>("Mee_pt3_eta0_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mee_pt0_eta1_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mee_pt1_eta1_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mee_pt2_eta1_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 80            ) tx.pushbackToBranch<float>("Mee_pt3_eta1_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mee_pt0_eta2_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mee_pt1_eta2_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mee_pt2_eta2_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 80            ) tx.pushbackToBranch<float>("Mee_pt3_eta2_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mee_pt0_eta3_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mee_pt1_eta3_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mee_pt2_eta3_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 80            ) tx.pushbackToBranch<float>("Mee_pt3_eta3_pass", tx.getBranchLazy<float>("mll"));
+                                              }
+                                              else
+                                              {
+                                                  if      (eta >= 0   and eta < 0.9 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mee_pt0_eta0_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mee_pt1_eta0_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mee_pt2_eta0_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 80            ) tx.pushbackToBranch<float>("Mee_pt3_eta0_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mee_pt0_eta1_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mee_pt1_eta1_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mee_pt2_eta1_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 80            ) tx.pushbackToBranch<float>("Mee_pt3_eta1_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mee_pt0_eta2_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mee_pt1_eta2_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mee_pt2_eta2_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 80            ) tx.pushbackToBranch<float>("Mee_pt3_eta2_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mee_pt0_eta3_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mee_pt1_eta3_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mee_pt2_eta3_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 80            ) tx.pushbackToBranch<float>("Mee_pt3_eta3_fail", tx.getBranchLazy<float>("mll"));
+                                              }
+                                              tx.fill();
+                                          }
+                                          if (
+                                              (fabs(nt.Electron_pt()[jel]) > 40) and // additional pt cuts to go above trigger
+                                              (fabs(nt.Electron_sip3d()[jel]) < 4) and
+                                              (fabs(nt.Electron_mvaFall17V2Iso_WP90()[jel]))
+                                             )
+                                          {
+                                              tx.setBranch<int>("is_ee", true);
+                                              tx.setBranch<int>("is_mm", false);
+                                              tx.setBranch<LV>("tag_p4", nt.Electron_p4()[jel]);
+                                              tx.setBranch<LV>("p4", nt.Electron_p4()[iel]);
+                                              tx.setBranch<int>("pass_ttHTightId", ttH::electronID(iel, ttH::IDtight, nt.year()));
+                                              float pt = tx.getBranchLazy<LV>("p4").pt();
+                                              float eta = fabs(tx.getBranchLazy<LV>("p4").eta());
+                                              bool pass = tx.getBranchLazy<int>("pass_ttHTightId");
+                                              if (pass)
+                                              {
+                                                  if      (eta >= 0   and eta < 0.9 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mee_pt0_eta0_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mee_pt1_eta0_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mee_pt2_eta0_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 80            ) tx.pushbackToBranch<float>("Mee_pt3_eta0_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mee_pt0_eta1_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mee_pt1_eta1_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mee_pt2_eta1_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 80            ) tx.pushbackToBranch<float>("Mee_pt3_eta1_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mee_pt0_eta2_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mee_pt1_eta2_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mee_pt2_eta2_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 80            ) tx.pushbackToBranch<float>("Mee_pt3_eta2_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mee_pt0_eta3_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mee_pt1_eta3_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mee_pt2_eta3_pass", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 80            ) tx.pushbackToBranch<float>("Mee_pt3_eta3_pass", tx.getBranchLazy<float>("mll"));
+                                              }
+                                              else
+                                              {
+                                                  if      (eta >= 0   and eta < 0.9 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mee_pt0_eta0_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mee_pt1_eta0_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mee_pt2_eta0_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0   and eta < 0.9 and pt >= 80            ) tx.pushbackToBranch<float>("Mee_pt3_eta0_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mee_pt0_eta1_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mee_pt1_eta1_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mee_pt2_eta1_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 0.9 and eta < 1.2 and pt >= 80            ) tx.pushbackToBranch<float>("Mee_pt3_eta1_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mee_pt0_eta2_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mee_pt1_eta2_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mee_pt2_eta2_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 1.2 and eta < 2.1 and pt >= 80            ) tx.pushbackToBranch<float>("Mee_pt3_eta2_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 40 and pt < 45) tx.pushbackToBranch<float>("Mee_pt0_eta3_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 45 and pt < 55) tx.pushbackToBranch<float>("Mee_pt1_eta3_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 55 and pt < 80) tx.pushbackToBranch<float>("Mee_pt2_eta3_fail", tx.getBranchLazy<float>("mll"));
+                                                  else if (eta >= 2.1               and pt >= 80            ) tx.pushbackToBranch<float>("Mee_pt3_eta3_fail", tx.getBranchLazy<float>("mll"));
+                                              }
+                                              tx.fill();
+                                          }
+                                          return true;
+                                      }, UNITY);
 
     ana.histograms.addHistogram("Nlep", 7, 0, 7, [&]() { return tx.getBranchLazy<vector<LV>>("lep_p4s").size(); } );
     ana.histograms.addHistogram("MllFull", 180, 0, 250, [&]() { return tx.getBranch<float>("mll"); } );
     ana.histograms.addHistogram("Mll", 180, 60, 120, [&]() { return tx.getBranch<float>("mll"); } );
 
+    RooUtil::Histograms histograms_Mmm;
+    RooUtil::Histograms histograms_Mee;
+    histograms_Mmm.addVecHistogram("Mmm_pt0_eta0_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt0_eta0_pass"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt1_eta0_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt1_eta0_pass"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt2_eta0_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt2_eta0_pass"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt3_eta0_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt3_eta0_pass"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt0_eta1_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt0_eta1_pass"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt1_eta1_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt1_eta1_pass"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt2_eta1_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt2_eta1_pass"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt3_eta1_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt3_eta1_pass"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt0_eta2_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt0_eta2_pass"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt1_eta2_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt1_eta2_pass"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt2_eta2_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt2_eta2_pass"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt3_eta2_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt3_eta2_pass"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt0_eta3_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt0_eta3_pass"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt1_eta3_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt1_eta3_pass"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt2_eta3_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt2_eta3_pass"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt3_eta3_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt3_eta3_pass"); } );
+
+    histograms_Mee.addVecHistogram("Mee_pt0_eta0_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt0_eta0_pass"); } );
+    histograms_Mee.addVecHistogram("Mee_pt1_eta0_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt1_eta0_pass"); } );
+    histograms_Mee.addVecHistogram("Mee_pt2_eta0_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt2_eta0_pass"); } );
+    histograms_Mee.addVecHistogram("Mee_pt3_eta0_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt3_eta0_pass"); } );
+    histograms_Mee.addVecHistogram("Mee_pt0_eta1_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt0_eta1_pass"); } );
+    histograms_Mee.addVecHistogram("Mee_pt1_eta1_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt1_eta1_pass"); } );
+    histograms_Mee.addVecHistogram("Mee_pt2_eta1_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt2_eta1_pass"); } );
+    histograms_Mee.addVecHistogram("Mee_pt3_eta1_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt3_eta1_pass"); } );
+    histograms_Mee.addVecHistogram("Mee_pt0_eta2_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt0_eta2_pass"); } );
+    histograms_Mee.addVecHistogram("Mee_pt1_eta2_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt1_eta2_pass"); } );
+    histograms_Mee.addVecHistogram("Mee_pt2_eta2_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt2_eta2_pass"); } );
+    histograms_Mee.addVecHistogram("Mee_pt3_eta2_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt3_eta2_pass"); } );
+    histograms_Mee.addVecHistogram("Mee_pt0_eta3_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt0_eta3_pass"); } );
+    histograms_Mee.addVecHistogram("Mee_pt1_eta3_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt1_eta3_pass"); } );
+    histograms_Mee.addVecHistogram("Mee_pt2_eta3_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt2_eta3_pass"); } );
+    histograms_Mee.addVecHistogram("Mee_pt3_eta3_pass", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt3_eta3_pass"); } );
+
+    histograms_Mmm.addVecHistogram("Mmm_pt0_eta0_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt0_eta0_fail"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt1_eta0_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt1_eta0_fail"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt2_eta0_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt2_eta0_fail"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt3_eta0_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt3_eta0_fail"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt0_eta1_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt0_eta1_fail"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt1_eta1_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt1_eta1_fail"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt2_eta1_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt2_eta1_fail"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt3_eta1_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt3_eta1_fail"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt0_eta2_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt0_eta2_fail"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt1_eta2_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt1_eta2_fail"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt2_eta2_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt2_eta2_fail"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt3_eta2_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt3_eta2_fail"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt0_eta3_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt0_eta3_fail"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt1_eta3_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt1_eta3_fail"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt2_eta3_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt2_eta3_fail"); } );
+    histograms_Mmm.addVecHistogram("Mmm_pt3_eta3_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mmm_pt3_eta3_fail"); } );
+
+    histograms_Mee.addVecHistogram("Mee_pt0_eta0_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt0_eta0_fail"); } );
+    histograms_Mee.addVecHistogram("Mee_pt1_eta0_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt1_eta0_fail"); } );
+    histograms_Mee.addVecHistogram("Mee_pt2_eta0_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt2_eta0_fail"); } );
+    histograms_Mee.addVecHistogram("Mee_pt3_eta0_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt3_eta0_fail"); } );
+    histograms_Mee.addVecHistogram("Mee_pt0_eta1_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt0_eta1_fail"); } );
+    histograms_Mee.addVecHistogram("Mee_pt1_eta1_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt1_eta1_fail"); } );
+    histograms_Mee.addVecHistogram("Mee_pt2_eta1_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt2_eta1_fail"); } );
+    histograms_Mee.addVecHistogram("Mee_pt3_eta1_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt3_eta1_fail"); } );
+    histograms_Mee.addVecHistogram("Mee_pt0_eta2_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt0_eta2_fail"); } );
+    histograms_Mee.addVecHistogram("Mee_pt1_eta2_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt1_eta2_fail"); } );
+    histograms_Mee.addVecHistogram("Mee_pt2_eta2_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt2_eta2_fail"); } );
+    histograms_Mee.addVecHistogram("Mee_pt3_eta2_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt3_eta2_fail"); } );
+    histograms_Mee.addVecHistogram("Mee_pt0_eta3_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt0_eta3_fail"); } );
+    histograms_Mee.addVecHistogram("Mee_pt1_eta3_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt1_eta3_fail"); } );
+    histograms_Mee.addVecHistogram("Mee_pt2_eta3_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt2_eta3_fail"); } );
+    histograms_Mee.addVecHistogram("Mee_pt3_eta3_fail", 180, 60, 120, [&]() { return tx.getBranchLazy<vector<float>>("Mee_pt3_eta3_fail"); } );
+
     ana.cutflow.bookCutflows();
-    ana.cutflow.bookHistogramsForCutAndBelow(ana.histograms, "MuonTnPPreselection");
-    ana.cutflow.bookHistogramsForCutAndBelow(ana.histograms, "ElecTnPPreselection");
+    ana.cutflow.bookHistogramsForCutAndBelow(ana.histograms, "MuonTnPTagProbePairSelection");
+    ana.cutflow.bookHistogramsForCutAndBelow(ana.histograms, "ElecTnPTagProbePairSelection");
+    ana.cutflow.bookHistogramsForCutAndBelow(histograms_Mmm, "MuonTnPTagProbePairSelection");
+    ana.cutflow.bookHistogramsForCutAndBelow(histograms_Mee, "ElecTnPTagProbePairSelection");
 
     while (ana.looper.nextEvent())
     {
@@ -363,7 +757,6 @@ int main(int argc, char** argv)
         }
 
         ana.cutflow.fill();
-        tx.fill();
         tx.clear();
     }
 
